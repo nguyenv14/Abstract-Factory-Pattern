@@ -1,4 +1,4 @@
-# 🏭 Hệ thống Giao Tiếp Đa Nền tảng - áp dụng Abstract Factory pattern
+# 🏭 Hệ thống Chat Đa Nền tảng - áp dụng Abstract Factory pattern
 
 ## 📌 Mục tiêu
 
@@ -79,7 +79,7 @@ Abstract Factory giải quyết triệt để các vấn đề trên bằng các
 
 ## 📦 Mở rộng
 
-Để thêm một Nền tảng mới (ví dụ: Slack):
+Để thêm một Nền tảng mới (ví dụ: Telegram):
 
 1. Tạo `TelegramMessage` implements `IMessage`
 2. Tạo `TelegramSender` implements `ISender`
