@@ -9,8 +9,8 @@ Trọng tâm là **tách rời logic nghiệp vụ với các Nền tảng thôn
 
 Giả sử ứng dụng cần gửi thông báo qua nhiều Nền tảng:
 
-- 📧 Messenger
-- 📱 Zalo
+- 📧 Zalo
+- 📱 Slack
 - 📢 MS Teams
 
 Mỗi Nền tảng cần có 2 thành phần:
@@ -20,14 +20,16 @@ Mỗi Nền tảng cần có 2 thành phần:
 
 Nếu code trực tiếp như sau (sau này cần sửa code này lại cho đúng với code dự án mình):
 
-```csharp
-if (platform == "Messenger") {
-    var msg = new MessengerMessage();
-    var sender = new MessengerSender();
-    sender.Send(msg);
-} else if (platform == "Zalo") {
-    ...
-}
+```php
+if ($platform === 'zalo') {
+        echo "📩 Gửi qua Zalo: [Zalo] $text\n";
+        // Gọi API Zalo tại đây
+    }
+    else if ($platform === 'slack') {
+        echo "📩 Gửi qua Slack: [Slack] $text\n";
+        // Gọi Slack webhook tại đây
+    }
+   ...
 ```
 
 thì sẽ phát sinh vấn đề:
@@ -38,7 +40,20 @@ thì sẽ phát sinh vấn đề:
 
 ❌ Không thể mở rộng linh hoạt: client code phụ thuộc vào class cụ thể (Concrete class)
 
-## 🏭 Tại sao dùng Abstract Factory
+## ✅Dùng Abstract Factory
+
+```php
+$service = new NotificationService(new ZaloFactory());
+$service->notify("Xin chào");
+
+$service = new NotificationService(new SlackFactory());
+$service->notify("Có bug mới");
+
+$service = new NotificationService(new TeamsFactory());
+$service->notify("Họp lúc 10h");
+```
+
+## 🏭 Lợi ích khi dùng Abstract Factory
 
 Abstract Factory giải quyết triệt để các vấn đề trên bằng cách:
 
@@ -56,28 +71,6 @@ Abstract Factory giải quyết triệt để các vấn đề trên bằng các
 - MessengerFactory, ZaloFactory, - SlackFactory, TelegramFactory, PushFactory: các Concrete Factory
 - NotificationService: client sử dụng factory để gửi thông báo
 
-## ⚙️ Cách sử dụng
-
-1. Chọn Nền tảng thông báo bằng cách khởi tạo `IMessengerFactory ` tương ứng:
-
-   ```csharp
-   IMessengerFactory  factory = new IMessengerFactory ();
-   // hoặc new ZaloFactory();
-   // hoặc new MessengerFactory();
-   ```
-
-2. Truyền `factory` vào `NotificationService`:
-
-   ```csharp
-   var service = new NotificationService(factory);
-   service.Notify();
-   ```
-
-3. Kết quả ví dụ:
-   ```
-   Gửi qua Slack: Slack: Có thông báo hệ thống mới
-   ```
-
 ## 💡 Lợi ích
 
 - Tách biệt logic gửi thông báo với loại Nền tảng cụ thể -> Client code không phụ thuộc vào class cụ thể → dễ mở rộng
@@ -88,6 +81,15 @@ Abstract Factory giải quyết triệt để các vấn đề trên bằng các
 
 Để thêm một Nền tảng mới (ví dụ: Slack):
 
-1. Tạo `SlackMessage` implements `IMessage`
-2. Tạo `SlackSender` implements `ISender`
-3. Tạo `SlackNotificationFactory` implements `INotificationFactory` và trả về hai class trên
+1. Tạo `TelegramMessage` implements `IMessage`
+2. Tạo `TelegramSender` implements `ISender`
+3. Tạo `TelegramFactory` implements `INotificationFactory`
+
+Sau đó chỉ cần:
+
+```php
+$service = new NotificationService(new TelegramFactory());
+$service->notify("Xin chào từ Telegram!");
+```
+
+Không cần sửa bất kỳ dòng code cũ nào — đây chính là ưu điểm lớn nhất của Abstract Factory.
